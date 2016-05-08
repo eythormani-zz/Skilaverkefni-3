@@ -1,0 +1,12 @@
+.eventContainer{
+	text-align: center;
+	margin: 10px 0;
+}
+.eventContainer img{
+	border:1px solid black;
+	width:287px;
+	height:192px;
+}
+.container-fluid{
+	margin:10px 50px;
+}
