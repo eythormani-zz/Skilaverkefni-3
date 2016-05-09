@@ -8,9 +8,9 @@ $.ajax({
 		startSearch();
 		loadLocationCheckboxes();
 		checkboxFilter();
+		filterByDate();
 	}
 });
-
 function renderData(datas) {
 	var data = datas['results']
 	console.log(data.length);
@@ -18,18 +18,48 @@ function renderData(datas) {
 		var event = data[i];
 		var date = changeDate(event.dateOfShow);
 		var insert = $("#mainThing");
-		var eventTile = "<div class=\"col-md-4 eventContainer\"><img src='" + event.imageSource + "'><div class='eventName'>" + event.eventDateName + "</div><div class='location' data-location='" + event.eventHallName + "'>Staðsetning: " + event.eventHallName + "</div><div>Tími: " + date + "</div></div>";
+		var eventTile = "<div class=\"col-md-4 eventContainer\"><img src='" + event.imageSource + "'><div class='eventName'>" + event.eventDateName + "</div><div class='location' data-location='" + event.eventHallName + "'>Staðsetning: " + event.eventHallName + "</div><div class='eventTime' data-time='" + event.dateOfShow + "'>Tími: " + date + "</div></div>";
 		insert.append(eventTile);
 	}
 }
-
 function changeDate(date) {
 	var d = new Date(date);
 	var day = d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
 	var time = date.substring(11, date.length -3);
 	return (day + " - " + time);
 }
+//end old code
+//start new code
+var filterByDate = function () {
+	var events = $('#mainThing .eventContainer');
+	var cache = [];
+	//run through all the events and add them in the correct manor to the cache array
+	events.each(function() {
+		//get the us date from the data-time tag in each event
+		var date = $(this).children('.eventTime').data().time.trim().toLowerCase();
+		//make the date into an actual date
+		var fixedDate = new Date(date);
+		cache.push({
+			element: this,
+			//add the number of seconds since january 1st 1970 into the object next to the element itself
+			date: fixedDate.getTime()
+		});
+	});
+	//get the from and to dates from the form
+	$("#dateButton").click(function() {
+		var fromDate = new Date($("#fromDate").val());
+		var toDate = new Date($("#toDate").val());
+		for (var i = 0; i < cache.length; i++) {
+			if (cache[i].date >= fromDate && cache[i].date <= toDate) {
+				cache[i].element.style.display = "";
+			}
+			else{
+				cache[i].element.style.display = "none";
+			}
+		}
+	});
 
+}
 
 var startSearch = function() {
 	//works despite being reserved
@@ -135,8 +165,10 @@ var checkboxFilter = function () {
 	}
 }
 
-//add two functions onto all arrays, contains and unique
 
+
+
+//add two functions onto all arrays, contains and unique
 //returns true or false depending on whether or not an array contains a certain element
 Array.prototype.contains = function(v) {
 	//run through all of the array
